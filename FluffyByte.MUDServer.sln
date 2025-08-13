@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36301.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluffyByte.MUDServer", "FluffyByte.MUDServer\FluffyByte.MUDServer.csproj", "{C0D94460-2FDD-4422-B6DC-BD6FB880246F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2418BA8C-BE12-4F97-8EAA-1A01582A1B7A} = {2418BA8C-BE12-4F97-8EAA-1A01582A1B7A}
+		{9439713A-06E7-4DD2-82E5-A3D777DB596C} = {9439713A-06E7-4DD2-82E5-A3D777DB596C}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluffyByte.FileSystem", "FluffyByte.FileSystem\FluffyByte.FileSystem.csproj", "{2418BA8C-BE12-4F97-8EAA-1A01582A1B7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluffyByte.Utilities", "FluffyByte.Utilities\FluffyByte.Utilities.csproj", "{9439713A-06E7-4DD2-82E5-A3D777DB596C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C0D94460-2FDD-4422-B6DC-BD6FB880246F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0D94460-2FDD-4422-B6DC-BD6FB880246F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0D94460-2FDD-4422-B6DC-BD6FB880246F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0D94460-2FDD-4422-B6DC-BD6FB880246F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2418BA8C-BE12-4F97-8EAA-1A01582A1B7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2418BA8C-BE12-4F97-8EAA-1A01582A1B7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2418BA8C-BE12-4F97-8EAA-1A01582A1B7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2418BA8C-BE12-4F97-8EAA-1A01582A1B7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9439713A-06E7-4DD2-82E5-A3D777DB596C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9439713A-06E7-4DD2-82E5-A3D777DB596C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9439713A-06E7-4DD2-82E5-A3D777DB596C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9439713A-06E7-4DD2-82E5-A3D777DB596C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BC78B11D-66A5-4B31-944C-FFF71D56D85C}
+	EndGlobalSection
+EndGlobal
