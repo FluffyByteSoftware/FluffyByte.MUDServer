@@ -1,4 +1,9 @@
-﻿using System;
+﻿// FluffyByte.Utilities.Wizards.Scribe.cs
+// Written by: Jacob Chacko
+// The Scribe class is a static utility class that provides methods for logging messages to the console.
+// Also provides incredibly simplistic troubleshooting and debugging capabilities.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +24,11 @@ namespace FluffyByte.Utilities.Wizards
         private static readonly ConsoleColor _warningColor = ConstellationKeeper.Instance.WarningColor;
 
         // TimeStamps
+        /// <summary>
+        /// Returns the current UTC timestamp in the format 
+        /// "yyyy-dd-MM HH:mm:ss.fff".
+        /// </summary>
+        /// <returns>"yyyy-dd-MM HH:mm:ss.fff"</returns>
         public static string TimeStampNowUtc()
         {
             return DateTime.UtcNow.ToString("yyyy-dd-MM HH:mm:ss.fff");
@@ -26,17 +36,26 @@ namespace FluffyByte.Utilities.Wizards
 
         // Info
         public static void Info(string message) => WriteLine(IOMessageLevel.Info, message);
+
+        /// <summary>
+        /// InfoAsync is an asynchronous method that logs an informational message.
+        /// </summary>
+        /// <param name="message">Message to be displayed.</param>
         public static async Task InfoAsync(string message) => await Task.Run(() => Info(message));
         
         // Warn
+        /// <summary>
+        /// Warn is a method that logs a warning message.
+        /// </summary>
+        /// <param name="message">Message to be displayed.</param>
         public static void Warn(string message) => WriteLine(IOMessageLevel.Warn, message);
         public static async Task WarnAsync(string message) => await Task.Run(() => Warn(message));
 
 
         /// <summary>
-        /// 
+        /// Warn is a method that logs an exception warning message.
         /// </summary>
-        /// <param name="ex"></param>
+        /// <param name="ex">Exception to be investigated</param>
         public static void Warn(Exception ex)
         {
             StringBuilder sb = new();
@@ -146,24 +165,11 @@ namespace FluffyByte.Utilities.Wizards
                     throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
             }
 
-            // Write to console
-            lock(_lock)
-            {
-                try
-                {
-                    IOWizard.Instance.WriteLine(
-                        text: sb.ToString(),
-                        foreGroundColor: outputColor,
-                        backGroundColor: null,
-                        resetColors: true);
-                }
-                catch(Exception ex)
-                {
-                    IOWizard.Instance.WriteLine(
-                        $"An error occurred while writing to the console: {ex.Message}",
-                        _errorColor);
-                }
-            }
+            IOWizard.Instance.WriteLine(
+                text: sb.ToString(),
+                foreGroundColor: outputColor,
+                backGroundColor: null,
+                resetColors: true);
         }
 
         // InsertTimeStamp
