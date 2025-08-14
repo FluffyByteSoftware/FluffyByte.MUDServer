@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Core\FileIO\FileDefaults\" />
     <Folder Include="Core\Networking\Clients\" />
     <Folder Include="NonCode\" />
   </ItemGroup>

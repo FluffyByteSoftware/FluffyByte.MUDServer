@@ -29,13 +29,30 @@ namespace FluffyByte.MUDServer.Core.ConsoleIO
         /// </summary>
         public bool IgnoreEmptyLines { get; set; } = true;
 
-        // Events (lightweight; fire only from the pump / write paths to avoid duplicates)
+        /// <summary>
+        /// Occurs when input is received.
+        /// </summary>
+        /// <remarks>This event is triggered whenever a string input is received. Subscribers can handle
+        /// the event to process or respond to the input.</remarks>
         public event Action<string>? OnInputReceived;
+
+        /// <summary>
+        /// Occurs when output is written, providing the message and its associated color.
+        /// </summary>
+        /// <remarks>Subscribers to this event receive the output message as a string and the color to be
+        /// used for displaying the message as a <see cref="ConsoleColor"/>. The event is triggered whenever output is
+        /// written, allowing customization of how the output is handled or displayed.</remarks>
         public event Action<string, ConsoleColor>? OnOutputWritten;
 
         // State
         private readonly CancellationTokenSource _cts = new();
         
+        /// <summary>
+        /// Represents an unbounded channel for queuing string messages with a single writer and multiple readers.
+        /// </summary>
+        /// <remarks>This channel is configured to allow multiple readers to await messages concurrently,
+        /// while ensuring that only a single writer can enqueue messages. Synchronous continuations are disabled to
+        /// prevent potential blocking issues.</remarks>
         private readonly Channel<string> _inQueue = Channel.CreateUnbounded<string>(new UnboundedChannelOptions
         {
             SingleReader = false,   // allow multiple awaiting readers
@@ -46,6 +63,10 @@ namespace FluffyByte.MUDServer.Core.ConsoleIO
         private readonly Task _inPumpTask;
         private readonly SemaphoreSlim _writeGate = new(1, 1);
         private volatile bool _disposed;
+        
+        /// <summary>
+        /// Gets a value indicating whether the object has been disposed.
+        /// </summary>
         public bool IsDisposed => _disposed;
 
         #region IInput

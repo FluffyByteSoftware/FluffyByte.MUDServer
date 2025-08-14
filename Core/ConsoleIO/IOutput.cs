@@ -1,7 +1,7 @@
-﻿namespace FluffyByte.MUDServer.Core.ConsoleIO
-{
-    using System.Text;
+﻿using System.Text;
 
+namespace FluffyByte.MUDServer.Core.ConsoleIO
+{
     /// <summary>
     /// An interface for writing output to a destination, such as a console or network stream.
     /// </summary>
