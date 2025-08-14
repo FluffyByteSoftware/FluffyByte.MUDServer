@@ -18,14 +18,14 @@ namespace FluffyByte.MUDServer.Core.ConsoleIO
         }
         #endregion
 
-        // Configuration knobs
         /// <summary>
-        /// If true, incoming lines are trimmed (default: true).
+        /// Gets or sets a value indicating whether leading and trailing whitespace  should be removed 
+        /// from input strings.
         /// </summary>
         public bool TrimInput { get; set; } = true;
 
         /// <summary>
-        /// If true, empty lines are ignored instead of enqueued (default: true).
+        /// Gets or sets a value indicating whether empty lines should be ignored during processing.
         /// </summary>
         public bool IgnoreEmptyLines { get; set; } = true;
 

@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Folder Include="Core\Networking\Clients\" />
+    <Folder Include="NonCode\" />
   </ItemGroup>
 
 </Project>

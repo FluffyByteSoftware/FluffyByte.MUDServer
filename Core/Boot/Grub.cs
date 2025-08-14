@@ -8,7 +8,7 @@ namespace FluffyByte.MUDServer.Core.Boot
         {
             if(args.Length == 0)
             {
-                Scribe.Write(LogLevel.Info, "Test");
+                
             }
 
             Scribe.Info("Info");
