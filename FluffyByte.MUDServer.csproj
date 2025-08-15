@@ -8,9 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Core\FileIO\FileDefaults\" />
     <Folder Include="Core\Networking\Clients\" />
     <Folder Include="NonCode\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FluffyByte.FileIO\FluffyByte.FileIO.csproj" />
+    <ProjectReference Include="..\FluffyByte.Logger\FluffyByte.Logger.csproj" />
   </ItemGroup>
 
 </Project>
