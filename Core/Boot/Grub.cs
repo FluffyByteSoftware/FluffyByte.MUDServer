@@ -4,14 +4,16 @@ using System.Text.Unicode;
 using System.Threading.Tasks;
 using FluffyByte.FileIO;
 using FluffyByte.Logger;
+using FluffyByte.FileIO.Interfaces;
 
 using FluffyByte.MUDServer.Utilities;
+using System.Runtime.CompilerServices;
 
 namespace FluffyByte.MUDServer.Core.Boot
 {
     public class Grub
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             if(args.Length == 0)
             {
@@ -23,31 +25,20 @@ namespace FluffyByte.MUDServer.Core.Boot
             Scribe.Warn("Warn");
             Scribe.Error("Error");
 
-            CancellationToken ct = new();
+            FluffyFile test = new(@"E:\Temp\test.txt");
 
-            FluffyFile? temp = FileWizard.LoadFluffyFile(@"E:\Temp\test.txt", FileAccess.ReadWrite, createIfMissing: true, cancellationToken: ct).Result;
+            string content = await FluffyTextReader.ReadAllTextAsync(test);
 
-            if(temp is not null)
+            if(content is null)
             {
-                Scribe.Info("Loaded file.");
-                Scribe.Info($"Path: {temp.Path}");
-                Scribe.Info($"Mode: {temp.Mode}");
-                Scribe.Info($"Last Modified: {File.GetLastWriteTime(temp.Path)}");
-
-
-                byte[]? contents = FileWizard.ReadAllBytesAsync(temp, ct).Result;
-
-                if (contents is not null)
-                {
-                    Scribe.Info("File contents read successfully.");
-                    Scribe.Info($"Contents Length: {contents.Length} bytes");
-                    Scribe.Info($"Scribe Contents: {Encoding.UTF8.GetString(contents)}");
-                }
+                Scribe.Info("Failed to load content.");
             }
             else
             {
-                Scribe.Error("Failed to load file.");
+                Scribe.Info("Content: ");
+                Scribe.Info(content);
             }
+
         }
     }
 }
