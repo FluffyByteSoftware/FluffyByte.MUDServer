@@ -11,7 +11,7 @@ public sealed class SystemOperator
     private SystemOperator()  { }
 
     public List<IFluffyCoreProcess> Processes { get; } = [];
-    private List<IFluffyCoreProcess> _started { get; } = [];
+    private List<IFluffyCoreProcess> Started { get; } = [];
     
     public FluffyCoreProcessState State = FluffyCoreProcessState.Stopped;
 
@@ -26,7 +26,7 @@ public sealed class SystemOperator
         Scribe.Log($"Initializing SystemOperator...");
         // Always ensure the sentinel is present.
 
-        _started.Clear();
+        Started.Clear();
         Processes.Clear();
 
         Sentinel sentinel = new();
@@ -71,7 +71,7 @@ public sealed class SystemOperator
             
             await process.RequestStartAsync();
             
-            _started.Add(process);
+            Started.Add(process);
         }
         
         State = FluffyCoreProcessState.Running;
@@ -92,7 +92,7 @@ public sealed class SystemOperator
 
             await process.RequestStopAsync();
             
-            _started.Remove(process);
+            Started.Remove(process);
         }
 
         State = FluffyCoreProcessState.Stopped;
@@ -111,7 +111,7 @@ public sealed class SystemOperator
 
         sb.AppendLine("Processes in _started");
         
-        foreach (var process in _started)
+        foreach (var process in Started)
         {
             sb.AppendLine($"Started Process: {process.Name} :: State: {process.State}");
         }

@@ -6,7 +6,7 @@ public abstract class Program
 {
     public static async Task Main(string[] args)
     {
-        SystemOperator.Singleton.Initialize();
+        await SystemOperator.Singleton.RequestInitAsync();
 
         Console.WriteLine("Loaded...");
 
