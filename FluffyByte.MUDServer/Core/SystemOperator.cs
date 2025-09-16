@@ -1,7 +1,8 @@
 using System.Text;
 using FluffyByte.MUDServer.Core.IO;
+using FluffyByte.MUDServer.Core.Processes;
 
-namespace FluffyByte.MUDServer.Core.Processes;
+namespace FluffyByte.MUDServer.Core;
 
 public sealed class SystemOperator
 {
@@ -10,7 +11,7 @@ public sealed class SystemOperator
     
     private SystemOperator()  { }
 
-    public List<IFluffyCoreProcess> Processes { get; } = [];
+    private List<IFluffyCoreProcess> Processes { get; } = [];
     private List<IFluffyCoreProcess> Started { get; } = [];
     
     public FluffyCoreProcessState State = FluffyCoreProcessState.Stopped;

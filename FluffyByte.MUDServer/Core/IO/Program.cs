@@ -8,10 +8,11 @@ public abstract class Program
     {
         await SystemOperator.Singleton.RequestInitAsync();
 
-        Console.WriteLine("Loaded...");
-
         Scribe.Log($"SystemOperator is: {SystemOperator.Singleton.State}");
 
+        await SystemOperator.Singleton.RequestStartAsync();
+        Scribe.Debug($"Bootup complete.");
+        
         Console.ReadLine();
 
         await SystemOperator.Singleton.RequestStopAsync();

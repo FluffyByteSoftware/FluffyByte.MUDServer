@@ -1,4 +1,4 @@
-namespace FluffyByte.MUDServer.Core.IO;
+namespace FluffyByte.MUDServer.Core.IO.Disk;
 
 public interface IFluffyTextFile 
 {
