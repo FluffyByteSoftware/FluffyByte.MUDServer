@@ -3,6 +3,11 @@ using FluffyByte.MUDServer.Core.Events;
 
 namespace FluffyByte.MUDServer.Core.Helpers;
 
+/// <summary>
+/// The primary purpose of the Oracle is to manage and dispatch actions within the MUD server.
+/// It acts as a central hub where actions can be registered, and interested components can subscribe to
+/// these actions to receive notifications when they are triggered.
+/// </summary>
 public class Oracle
 {
     private static readonly Lazy<Oracle> Instance = new(() => new());
@@ -20,6 +25,11 @@ public class Oracle
         }
     }
     
+    /// <summary>
+    /// Handles the specified action by notifying all registered handlers.
+    /// </summary>
+    /// <param name="action">The action to handle.</param>
+    /// <param name="args">Arguments, if any to pass</param>
     public void HandleAction(FluffyAction action, object[]? args = null)
     {
         if (args == null || args.Length == 0)

@@ -1,14 +1,19 @@
 using System.Runtime.CompilerServices;
+using System.Text;
+using FluffyByte.MUDServer.Core.IO.Disk;
 using FluffyByte.MUDServer.Core.IO.ErrorTracker;
 
 namespace FluffyByte.MUDServer.Core.IO;
 
 public static class Scribe
 {
+    // ReSharper disable once MemberCanBePrivate.Global
     public static bool DebugMode { get; set; } = true;
-    public static string LogFilePath { get; set; } = "Logs/scribe.log";
-    public static string LogFileSettings { get; set; } = "Settings/scribe.settings";
+    
+    private static string LogFilePath { get; set; } = "Logs/scribe.log";
 
+    private static readonly IFluffyTextFile LogFile = new FluffyTextFile(LogFilePath);
+    
     public static void Log(string message)
     {
         WriteLine($"[LOG - {DateTime.UtcNow} ] - {message}");
@@ -43,5 +48,12 @@ public static class Scribe
         Console.ForegroundColor = fgColor;
         Console.WriteLine(message);
         Console.ResetColor();
+
+        bool result = FluffyTextFileManager.SaveFile(LogFile, encoding: Encoding.UTF8, createDirectory: true);
+
+        if (result && DebugMode)
+            Console.WriteLine("Updated logfile.");
+        else
+            Console.WriteLine("Failed to save logfile!");
     }
 }

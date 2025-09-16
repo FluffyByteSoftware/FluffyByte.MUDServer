@@ -36,12 +36,6 @@ public sealed class SystemOperator
     
     public async Task RequestInitAsync()
     {
-        if (Processes.Count == 0)
-        {
-            Scribe.Log("Processes were not defined. Cannot initialize.");
-            return;
-        }
-
         if (State == FluffyCoreProcessState.Running)
         {
             Scribe.Log($"SystemOperator is already running.");
