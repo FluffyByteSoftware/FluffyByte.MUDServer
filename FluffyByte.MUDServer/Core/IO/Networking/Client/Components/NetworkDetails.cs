@@ -5,6 +5,9 @@ using FluffyByte.MUDServer.Core.Helpers;
 
 namespace FluffyByte.MUDServer.Core.IO.Networking.Client.Components;
 
+/// <summary>
+/// Component that preserves the Network Details for the IFluffyClient
+/// </summary>
 public sealed class NetworkDetails : IFluffyClientComponent
 {
     public string Name => "Network Details";

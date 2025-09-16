@@ -115,7 +115,7 @@ public sealed class Sentinel : FluffyCoreProcessTemplate
 
             await netClient.Messenger.SendMessageAsync("Welcome to FluffyMUD");
             
-            await SystemOperator.Singleton.WalmartGreeter.WelcomeNewCustomer(netClient);
+            await SystemOperator.Singleton.ClientGreeter.WelcomeNewCustomer(netClient);
         }
         catch (OperationCanceledException)
         {

@@ -13,7 +13,7 @@ public sealed class FluffyClient : IFluffyClient
     private bool _disconnecting;
     private bool _disposing;
     
-    private List<IFluffyClientComponent> _components = [];
+    private readonly List<IFluffyClientComponent> _components = [];
 
     public CancellationTokenSource CancelMe { get; private set; } = new();
 
@@ -24,7 +24,7 @@ public sealed class FluffyClient : IFluffyClient
 
     public NetworkDetails Details { get; private set; }
     public Messenger Messenger { get; private set; }
-
+    
     public bool IsConnected
     {
         get
@@ -76,6 +76,7 @@ public sealed class FluffyClient : IFluffyClient
         
         _components.Add(Details);
         _components.Add(Messenger);
+        
         _onConnected.Invoke();
     }
 

@@ -16,7 +16,7 @@ public sealed class SystemOperator
     private readonly List<IFluffyCoreProcess> _started = [];
 
     public Sentinel Sentinel { get; private set; } = new();
-    public WalmartGreeter WalmartGreeter { get; private set; } = new();
+    public ClientGreeter ClientGreeter { get; private set; } = new();
     
     public FluffyCoreProcessState State { get; private set; } = FluffyCoreProcessState.Stopped;
 
@@ -46,10 +46,10 @@ public sealed class SystemOperator
         _onInitialized.Invoke();
 
         Sentinel = new Sentinel();
-        WalmartGreeter = new WalmartGreeter();
+        ClientGreeter = new ClientGreeter();
         
         _processes.Add(Sentinel);
-        _processes.Add(WalmartGreeter);
+        _processes.Add(ClientGreeter);
 
         foreach (var process in _processes)
         {

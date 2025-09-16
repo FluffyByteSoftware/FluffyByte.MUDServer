@@ -2,6 +2,10 @@ using FluffyByte.MUDServer.Core.Helpers;
 
 namespace FluffyByte.MUDServer.Core.IO.Networking.Client.Components;
 
+/// <summary>
+/// Messenger component for handling sending and receiving messages to/from the client.
+/// </summary>
+/// <param name="client">Pass the type IFluffyClient that will contain the Messenger.</param>
 public sealed class Messenger(IFluffyClient client) : IFluffyClientComponent
 {
     private readonly StreamWriter _writer = 

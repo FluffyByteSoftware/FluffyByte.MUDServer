@@ -3,7 +3,7 @@ using FluffyByte.MUDServer.Core.IO.Networking.Client;
 
 namespace FluffyByte.MUDServer.Core.Processes;
 
-public sealed class WalmartGreeter : IFluffyCoreProcess
+public sealed class ClientGreeter : IFluffyCoreProcess
 {
     public string Name => "Walmart Greeter";
     public bool GreetNewUsers { get; set; } = true;
