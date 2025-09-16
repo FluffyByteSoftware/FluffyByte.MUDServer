@@ -9,7 +9,6 @@ public sealed class WalmartGreeter : IFluffyCoreProcess
     public bool GreetNewUsers { get; set; } = true;
     
     public CancellationTokenSource CancellationTokenSource { get; set; } = new();
-
     public FluffyCoreProcessState State { get; private set; } = FluffyCoreProcessState.Stopped;
 
     public async Task InitializeAsync(CancellationToken cancellationToken = default)
