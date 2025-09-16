@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using System.Text;
 using FluffyByte.MUDServer.Core.IO.Disk;
 using FluffyByte.MUDServer.Core.IO.ErrorTracker;
 
@@ -13,16 +12,21 @@ public static class Scribe
     private static string LogFilePath { get; set; } = "Logs/scribe.log";
 
     private static readonly IFluffyTextFile LogFile = new FluffyTextFile(LogFilePath);
+
+    private static List<string> _logBuffer = [];
+    private const int BufferSize = 1024;
+    
+    private static readonly Lock LogLocker = new Lock();
     
     public static void Log(string message)
     {
-        WriteLine($"[LOG - {DateTime.UtcNow} ] - {message}");
+        WriteLine($"[LOG] - {message}");
     }
 
     public static void Debug(string message)
     {
         if (DebugMode)
-            WriteLine($"[DEBUG - {DateTime.UtcNow} ] - {message}", ConsoleColor.Green);
+            WriteLine($"[DEBUG] - {message}", ConsoleColor.Green);
     }
     
     public static void Error(Exception ex,
@@ -30,7 +34,7 @@ public static class Scribe
             [CallerMemberName] string? memberName = null,
             [CallerFilePath] string? filePath = null)
     {
-        WriteLine($"[ ERROR ENCOUNTERED ]", ConsoleColor.Red);
+        WriteLine($"[ERROR]", ConsoleColor.Red);
         
         FluffyError error = new(ex);
         
@@ -39,21 +43,38 @@ public static class Scribe
 
     public static void Error(string message)
     {
-        WriteLine($"[ ERROR ENCOUNTERED ] - {message}", ConsoleColor.Red);
+        WriteLine($"[ERROR] - {message}", ConsoleColor.Red);
     }
 
+    public static void Shutdown()
+    {
+    }
+    
     private static void WriteLine(string message, ConsoleColor fgColor = ConsoleColor.White)
     {
+        var timestampedMessage = $"{DateTime.UtcNow:yy-MM-dd hh:mm:ss.fff} {message}";
         Console.ResetColor();
         Console.ForegroundColor = fgColor;
-        Console.WriteLine(message);
+        Console.WriteLine(timestampedMessage);
         Console.ResetColor();
 
-        bool result = FluffyTextFileManager.SaveFile(LogFile, encoding: Encoding.UTF8, createDirectory: true);
+        _logBuffer.Add(message);
 
-        if (result && DebugMode)
-            Console.WriteLine("Updated logfile.");
-        else
-            Console.WriteLine("Failed to save logfile!");
+        lock (LogLocker)
+        {
+            if (_logBuffer.Count < BufferSize) return;
+            
+            WriteLogFile();
+            _logBuffer.Clear();
+        }
+    }
+
+    private static void WriteLogFile()
+    {
+        if (_logBuffer.Count == 0) return;
+
+        LogFile.Lines = new List<string>(_logBuffer);
+        
+        FluffyTextFileManager.SaveFile(LogFile);
     }
 }

@@ -12,7 +12,10 @@ public abstract class Program
         Scribe.Debug($"Bootup complete.");
         
         Console.ReadLine();
-
+        
         await SystemOperator.Singleton.RequestStopAsync();
+        
+        //Last operation
+        Scribe.Shutdown();
     }
 }
