@@ -1,4 +1,4 @@
-using FluffyByte.MUDServer.Core.IO;
+using FluffyByte.MUDServer.Core.Events;
 
 namespace FluffyByte.MUDServer.Core;
 
@@ -11,16 +11,24 @@ public abstract class FluffyCoreProcessTemplate : IFluffyCoreProcess
     public abstract FluffyCoreProcessState State { get; protected set;  }
 
     public abstract Task InitializeAsync(CancellationToken cancellationToken = default);
+
+    private readonly FluffyAction _requestStart = new FluffyAction("RequestStartProcess");
+    private readonly FluffyAction _started = new FluffyAction("StartedProcess");
+    private readonly FluffyAction _requestStop = new FluffyAction("RequestStopProcess");
+    private readonly FluffyAction _stopped = new FluffyAction("StoppedProcess");
     
     public async Task RequestStartAsync(CancellationToken cancellationToken = default) 
     {
         if(State is not FluffyCoreProcessState.Stopped)
             return;
 
+        _requestStart.Invoke();
+        
         await StartAsync();
 
         State = FluffyCoreProcessState.Running;
-        Scribe.Debug($"Started Process: {Name} :: {State}");
+
+        _started.Invoke();
     }
 
     public async Task RequestStopAsync(CancellationToken cancellationToken = default) 
@@ -28,12 +36,14 @@ public abstract class FluffyCoreProcessTemplate : IFluffyCoreProcess
         if(State is not FluffyCoreProcessState.Running)
             return;
 
+        _requestStop.Invoke();
         await StopAsync();
 
         await CancellationTokenSource.CancelAsync();
 
         State = FluffyCoreProcessState.Stopped;
-        Scribe.Debug($"Stopped Process: {Name} :: {State}");
+
+        _stopped.Invoke();
     }
 
     protected abstract Task StartAsync();

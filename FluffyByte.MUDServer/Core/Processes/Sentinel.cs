@@ -1,6 +1,7 @@
 using System.Net.Sockets;
 using System.Net;
 using FluffyByte.MUDServer.Core.IO;
+using FluffyByte.MUDServer.Core.IO.Networking.Client;
 
 namespace FluffyByte.MUDServer.Core.Processes;
 
@@ -9,15 +10,11 @@ public sealed class Sentinel : FluffyCoreProcessTemplate
     public override string Name => "Sentinel";
     public override FluffyCoreProcessState State { get; protected set; }
 
-    public TcpListener? Listener { get; private set; }
-
+    private TcpListener? Listener { get; set; }
+    
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         
-        Listener = new TcpListener(localaddr: IPAddress.Parse("10.0.0.84"), 
-            port: 9998);
-        
-        // Initialization logic here
         await Task.CompletedTask;
     }
 
@@ -43,14 +40,25 @@ public sealed class Sentinel : FluffyCoreProcessTemplate
 
     private async Task ListenForClients()
     {
-        while (!CancellationTokenSource.IsCancellationRequested 
-               && Listener is not null)
+        try
         {
-            var socket = await Listener.AcceptSocketAsync();
-            
-            Scribe.Log($"Client connected: {socket.RemoteEndPoint}");
-        }
+            while (!CancellationTokenSource.IsCancellationRequested
+                   && Listener is not null)
+            {
+                var client = await Listener.AcceptTcpClientAsync();
+                var netClient = new FluffyNetClient(client);
 
-        await Task.CompletedTask;
+                await netClient.SendMessage("Welcome to FluffyByte");
+            }
+        }
+        catch (IOException)
+        {
+            Scribe.Debug($"IOException in ListenForClients. " +
+                         $"Likely due to listener being stopped.");
+        }
+        catch (Exception ex)
+        {
+            Scribe.Error(ex);
+        }
     }
 }
