@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using FluffyByte.MUDServer.Core.IO.Disk;
 using FluffyByte.MUDServer.Core.IO.ErrorTracker;
 
-namespace FluffyByte.MUDServer.Core.IO;
+namespace FluffyByte.MUDServer.Core.Helpers;
 
 public static class Scribe
 {

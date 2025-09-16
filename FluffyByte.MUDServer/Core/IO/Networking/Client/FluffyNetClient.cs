@@ -1,6 +1,7 @@
 using System.Net.Sockets;
 using FluffyByte.MUDServer.Core.IO.Networking.Client.Components;
 using FluffyByte.MUDServer.Core.Events;
+using FluffyByte.MUDServer.Core.Helpers;
 
 namespace FluffyByte.MUDServer.Core.IO.Networking.Client;
 
@@ -29,17 +30,35 @@ public sealed class FluffyNetClient : IFluffyClient
         {
             try
             {
-                
-                return true;
+                bool isConnected = TcpClient.Connected;
+
+                if (isConnected)
+                {
+                    bool canRead = TcpClient.Client.Poll(0, SelectMode.SelectRead);
+                    bool hasData = TcpClient.Client.Available > 0;
+
+                    if (canRead && !hasData)
+                        isConnected = false;
+                }
+
+                if (!isConnected)
+                {
+                    _ = Task.Run(async () => await RequestDisconnectAsync());
+                }
+
+                return isConnected;
             }
+            catch (IOException) { }
             catch (Exception ex)
             {
                 Scribe.Error(ex);
                 return false;
             }
+
+            return false;
         }
     }
-    
+
     public FluffyNetClient(TcpClient tcpClient)
     {
         TcpClient = tcpClient;
@@ -54,18 +73,6 @@ public sealed class FluffyNetClient : IFluffyClient
         
         _components.Add(Details);
         _components.Add(Messenger);
-    }
-
-    public async Task SendMessage(string message, bool newline = true)
-    {
-        await Messenger.SendMessageAsync(message, newline);
-    }
-
-    public async Task<string> ReceiveMessage()
-    {
-        var response = await Messenger.ReadMessageAsync();
-
-        return response;
     }
 
     public async Task RequestDisconnectAsync()

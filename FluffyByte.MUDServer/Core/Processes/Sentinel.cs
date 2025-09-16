@@ -1,6 +1,6 @@
 using System.Net.Sockets;
 using System.Net;
-using FluffyByte.MUDServer.Core.IO;
+using FluffyByte.MUDServer.Core.Helpers;
 using FluffyByte.MUDServer.Core.IO.Networking.Client;
 
 namespace FluffyByte.MUDServer.Core.Processes;
@@ -48,7 +48,13 @@ public sealed class Sentinel : FluffyCoreProcessTemplate
                 var client = await Listener.AcceptTcpClientAsync();
                 var netClient = new FluffyNetClient(client);
 
-                await netClient.SendMessage("Welcome to FluffyByte");
+                await netClient.Messenger.SendMessageAsync("Welcome to FluffyByte");
+
+                var response = await netClient.Messenger.ReadMessageAsync();
+                
+                await netClient.Messenger.SendMessageAsync(response);
+                
+                await netClient.RequestDisconnectAsync();
             }
         }
         catch (IOException)

@@ -1,6 +1,8 @@
 using System.Net;
 using System.Net.Sockets;
 
+using FluffyByte.MUDServer.Core.Helpers;
+
 namespace FluffyByte.MUDServer.Core.IO.Networking.Client.Components;
 
 public sealed class NetworkDetails : IFluffyClientComponent

@@ -1,4 +1,6 @@
-﻿namespace FluffyByte.MUDServer.Core.IO;
+﻿using FluffyByte.MUDServer.Core.Helpers;
+
+namespace FluffyByte.MUDServer.Core.IO;
 
 public abstract class Program
 {

@@ -1,3 +1,5 @@
+using FluffyByte.MUDServer.Core.Helpers;
+
 namespace FluffyByte.MUDServer.Core.IO.Networking.Client.Components;
 
 public sealed class Messenger(IFluffyClient client) : IFluffyClientComponent
