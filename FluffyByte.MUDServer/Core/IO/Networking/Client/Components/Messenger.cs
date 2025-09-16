@@ -1,6 +1,6 @@
 namespace FluffyByte.MUDServer.Core.IO.Networking.Client.Components;
 
-public sealed class MessengerTool(IFluffyClient client) : IFluffyClientComponent
+public sealed class Messenger(IFluffyClient client) : IFluffyClientComponent
 {
     private readonly StreamWriter _writer = 
         new StreamWriter(client.TcpClient.GetStream()) { AutoFlush = true };
@@ -8,7 +8,7 @@ public sealed class MessengerTool(IFluffyClient client) : IFluffyClientComponent
     private readonly StreamReader _reader = 
         new StreamReader(client.TcpClient.GetStream());
     
-    public string Name => "MessengerTool";
+    public string Name => "Messenger";
     public CancellationTokenSource Cts { get; set; } = new CancellationTokenSource();
     
     public async Task SendMessageAsync(string message, bool newline = true)

@@ -1,5 +1,6 @@
 using System.Net.Sockets;
 using FluffyByte.MUDServer.Core.Events;
+using FluffyByte.MUDServer.Core.IO.Networking.Client.Components;
 
 namespace FluffyByte.MUDServer.Core.IO.Networking.Client;
 
@@ -17,4 +18,7 @@ public interface IFluffyClient : IAsyncDisposable
     FluffyAction OnConnected { get; }
     FluffyAction OnDisconnectRequested { get; }
     FluffyAction OnDisconnected { get; }
+
+    Messenger Messenger { get; }
+    NetworkDetails Details { get; }
 }

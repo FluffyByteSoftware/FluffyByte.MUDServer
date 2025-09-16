@@ -20,6 +20,9 @@ public sealed class FluffyNetClient : IFluffyClient
     public FluffyAction OnDisconnected { get; } = new("OnDisconnected");
     public FluffyAction OnDisconnectRequested { get; } = new("OnDisconnectRequested");
 
+    public NetworkDetails Details { get; private set; }
+    public Messenger Messenger { get; private set; }
+
     public bool IsConnected
     {
         get
@@ -36,31 +39,31 @@ public sealed class FluffyNetClient : IFluffyClient
             }
         }
     }
-
-    public MessengerTool MessengerTool { get; init; }
-
+    
     public FluffyNetClient(TcpClient tcpClient)
     {
         TcpClient = tcpClient;
 
         Name = tcpClient.Client.RemoteEndPoint?.ToString() ?? "Unknown";
         
-        MessengerTool = new MessengerTool(this);
-
-        _components.Add(MessengerTool);
-        
         _disconnecting = false;
         _disposing = false;
+
+        Details = new NetworkDetails(tcpClient);
+        Messenger = new Messenger(this);
+        
+        _components.Add(Details);
+        _components.Add(Messenger);
     }
 
     public async Task SendMessage(string message, bool newline = true)
     {
-        await MessengerTool.SendMessageAsync(message, newline);
+        await Messenger.SendMessageAsync(message, newline);
     }
 
     public async Task<string> ReceiveMessage()
     {
-        var response = await MessengerTool.ReadMessageAsync();
+        var response = await Messenger.ReadMessageAsync();
 
         return response;
     }
