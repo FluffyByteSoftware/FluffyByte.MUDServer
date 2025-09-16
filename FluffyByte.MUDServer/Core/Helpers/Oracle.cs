@@ -1,7 +1,8 @@
 using FluffyByte.MUDServer.Core.IO;
 using FluffyByte.MUDServer.Core.Events;
 
-namespace FluffyByte.MUDServer.Core.Processes;
+namespace FluffyByte.MUDServer.Core.Helpers;
+
 public class Oracle
 {
     private static readonly Lazy<Oracle> Instance = new(() => new());
