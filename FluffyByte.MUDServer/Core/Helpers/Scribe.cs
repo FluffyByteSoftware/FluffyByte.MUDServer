@@ -9,7 +9,7 @@ public static class Scribe
     // ReSharper disable once MemberCanBePrivate.Global
     public static bool DebugMode { get; set; } = true;
     
-    private static string LogFilePath { get; set; } = "Logs/scribe.log";
+    private static string LogFilePath { get; set; } = @"./Logs/scribe.log";
 
     private static readonly IFluffyTextFile LogFile = new FluffyTextFile(LogFilePath);
 

@@ -1,4 +1,5 @@
 using System.Text;
+using FluffyByte.MUDServer.Core.Events;
 using FluffyByte.MUDServer.Core.Helpers;
 using FluffyByte.MUDServer.Core.Processes;
 
@@ -11,11 +12,22 @@ public sealed class SystemOperator
     
     private SystemOperator()  { }
 
-    private List<IFluffyCoreProcess> Processes { get; } = [];
-    private List<IFluffyCoreProcess> Started { get; } = [];
-    
-    public FluffyCoreProcessState State = FluffyCoreProcessState.Stopped;
+    private readonly List<IFluffyCoreProcess> _processes = [];
+    private readonly List<IFluffyCoreProcess> _started = [];
 
+    public Sentinel Sentinel { get; private set; } = new();
+    
+    public FluffyCoreProcessState State { get; private set; } = FluffyCoreProcessState.Stopped;
+
+    private readonly FluffyAction _onInitRequested = new();
+    private readonly FluffyAction _onInitialized = new();
+    private readonly FluffyAction _onShutdownRequested = new();
+    private readonly FluffyAction _onShutdown = new();
+    private readonly FluffyAction _onStartRequested = new();
+    private readonly FluffyAction _onStarted = new();
+    private readonly FluffyAction _onChildStartRequested = new();
+    private readonly FluffyAction _onChildStarted = new();
+    
     private void Initialize()
     {
         if (State == FluffyCoreProcessState.Running)
@@ -26,12 +38,20 @@ public sealed class SystemOperator
 
         Scribe.Log($"Initializing SystemOperator...");
         // Always ensure the sentinel is present.
+        
+        _started.Clear();
+        _processes.Clear();
 
-        Started.Clear();
-        Processes.Clear();
+        _onInitialized.Invoke();
 
-        Sentinel sentinel = new();
-        Processes.Add(sentinel);
+        Sentinel = new Sentinel();
+        
+        _processes.Add(Sentinel);
+
+        foreach (var process in _processes)
+        {
+            process.InitializeAsync();
+        }
     }
     
     public async Task RequestInitAsync()
@@ -42,73 +62,84 @@ public sealed class SystemOperator
             return;
         }
 
+        _onInitRequested.Invoke();
+
         Initialize();
-        
-        foreach (var process in Processes)
-        {
-            Scribe.Debug($"Attempting to initialize... {process.Name}");
+
+        _onInitialized.Invoke();
             
-            await process.InitializeAsync();
-        }
+        State = FluffyCoreProcessState.Stopped;
+        
+        await Task.CompletedTask;
     }
     
     public async Task RequestStartAsync()
     {
-        if (Processes.Count == 0)
+        if (_processes.Count == 0)
         {
             Scribe.Log("Processes were not defined. Cannot start.");
             await Task.CompletedTask;
         }
+
+        _onStartRequested.Invoke();
         
-        foreach (var process in Processes)
+        foreach (var process in _processes)
         {
             Scribe.Debug($"Attempting to start... {process.Name}");
             
+            _onChildStartRequested.Invoke();
+            
             await process.RequestStartAsync();
             
-            Started.Add(process);
+            _started.Add(process);
+            
+            _onChildStarted.Invoke();
         }
         
-        State = FluffyCoreProcessState.Running;
+        this.State = FluffyCoreProcessState.Running;
+        _onStarted.Invoke();
     }
 
     public async Task RequestStopAsync()
     {
-        if (Processes.Count == 0)
+        if (_processes.Count == 0 || State is FluffyCoreProcessState.Stopped)
         {
-            Scribe.Log("Processes were not defined. Cannot stop.");
+            Scribe.Log("Processes were not started. Cannot stop.");
             await Task.CompletedTask;
         }
 
-        foreach (var process in Processes)
+        foreach (var process in _processes)
         {
+            _onShutdownRequested.Invoke();
             
             Scribe.Debug($"Attempting to stop... {process.Name}");
 
             await process.RequestStopAsync();
             
-            Started.Remove(process);
+            _started.Remove(process);
+            
+            _onShutdown.Invoke();
         }
 
         State = FluffyCoreProcessState.Stopped;
     }
 
-    public string RequestProcessStatesAsync()
+    public string RequestProcessStates()
     {
         StringBuilder sb = new();
 
         sb.AppendLine("Processes in Processes...");
         
-        foreach (var process in Processes)
+        foreach (var process in _processes)
         {
             sb.AppendLine($"Process: {process.Name} :: State: {process.State}");
         }
 
         sb.AppendLine("Processes in _started");
         
-        foreach (var process in Started)
+        foreach (var process in _started)
         {
-            sb.AppendLine($"Started Process: {process.Name} :: State: {process.State}");
+            sb.AppendLine($"_started Process: {process.Name} :: State: {process.State}");
         }
         
         return sb.ToString();

@@ -6,13 +6,16 @@ public abstract class Program
 {
     public static async Task Main(string[] args)
     {
+        Scribe.Log("Initializing System Operator...");
         await SystemOperator.Singleton.RequestInitAsync();
 
-        Scribe.Log($"SystemOperator is: {SystemOperator.Singleton.State}");
-
-        await SystemOperator.Singleton.RequestStartAsync();
-        Scribe.Debug($"Bootup complete.");
+        Scribe.Log("Starting System Operator...");
         
+        await SystemOperator.Singleton.RequestStartAsync();
+        
+        Scribe.Log(SystemOperator.Singleton.RequestProcessStates());
+
+        Scribe.Log("Press any key to shutdown.");
         Console.ReadLine();
         
         await SystemOperator.Singleton.RequestStopAsync();

@@ -12,10 +12,10 @@ public abstract class FluffyCoreProcessTemplate : IFluffyCoreProcess
 
     public abstract Task InitializeAsync(CancellationToken cancellationToken = default);
 
-    private readonly FluffyAction _requestStart = new FluffyAction("RequestStartProcess");
-    private readonly FluffyAction _started = new FluffyAction("StartedProcess");
-    private readonly FluffyAction _requestStop = new FluffyAction("RequestStopProcess");
-    private readonly FluffyAction _stopped = new FluffyAction("StoppedProcess");
+    private readonly FluffyAction _requestStart = new FluffyAction();
+    private readonly FluffyAction _started = new FluffyAction();
+    private readonly FluffyAction _requestStop = new FluffyAction();
+    private readonly FluffyAction _stopped = new FluffyAction();
     
     public async Task RequestStartAsync(CancellationToken cancellationToken = default) 
     {
@@ -27,7 +27,6 @@ public abstract class FluffyCoreProcessTemplate : IFluffyCoreProcess
         await StartAsync();
 
         State = FluffyCoreProcessState.Running;
-
         _started.Invoke();
     }
 

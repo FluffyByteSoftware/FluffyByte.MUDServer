@@ -11,30 +11,59 @@ public sealed class Sentinel : FluffyCoreProcessTemplate
     public override FluffyCoreProcessState State { get; protected set; }
 
     private TcpListener? Listener { get; set; }
+    private Task? _listeningTask;
+
+    private List<Task> _clientTasks = [];
+    
+    private static readonly IPAddress HostAddress = IPAddress.Parse("10.0.0.84");
+    private static readonly int HostPort = 9998;
     
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        
+        State = FluffyCoreProcessState.Stopped;
         await Task.CompletedTask;
     }
 
     protected override async Task StartAsync() 
     {
-        State = FluffyCoreProcessState.Running;
-
-        Listener ??= new TcpListener(localaddr: IPAddress.Parse("10.0.0.84"), 
-                port: 9998);
+        // Don't set State here - the template handles it
         
-        Listener?.Start();
-
-        _ = ListenForClients();
+        try
+        {
+            Listener ??= new TcpListener(HostAddress, HostPort);
+            Listener.Start();
+            
+            Scribe.Log($"Sentinel listening on {HostAddress}:{HostPort}");
+            
+            _listeningTask = ListenForClients();
+        }
+        catch (Exception ex)
+        {
+            Scribe.Error(ex);
+            throw;
+        }
 
         await Task.CompletedTask;
     }
 
-    protected override async Task StopAsync() 
+    protected override async Task StopAsync()
     {
-        State = FluffyCoreProcessState.Stopped;
+        // Don't set State or cancel tokens here - template handles it
+        
+        Listener?.Stop();
+
+        if (_listeningTask is not null)
+        {
+            try
+            {
+                await _listeningTask;
+            }
+            catch (Exception ex)
+            {
+                Scribe.Error(ex);
+            }
+        }
+
         await Task.CompletedTask;
     }
 
@@ -42,25 +71,58 @@ public sealed class Sentinel : FluffyCoreProcessTemplate
     {
         try
         {
-            while (!CancellationTokenSource.IsCancellationRequested
-                   && Listener is not null)
+            while (!CancellationTokenSource.IsCancellationRequested && Listener is not null)
             {
-                var client = await Listener.AcceptTcpClientAsync();
-                var netClient = new FluffyNetClient(client);
+                var client = await Listener.AcceptTcpClientAsync()
+                    .WaitAsync(CancellationTokenSource.Token);
 
-                await netClient.Messenger.SendMessageAsync("Welcome to FluffyByte");
+                // Start handling the client and track the task
+                var clientTask = HandleClientAsync(client);
+                _clientTasks.Add(clientTask);
 
-                var response = await netClient.Messenger.ReadMessageAsync();
-                
-                await netClient.Messenger.SendMessageAsync(response);
-                
-                await netClient.RequestDisconnectAsync();
+                // Clean up completed tasks periodically
+                _clientTasks.RemoveAll(t => t.IsCompleted);
             }
+        }
+        catch (OperationCanceledException)
+        {
+            Scribe.Debug("Listen operation was canceled - stopping client acceptance");
+        }
+        catch (ObjectDisposedException)
+        {
+            Scribe.Debug("Listener disposed - stopping client acceptance");
+        }
+        catch (SocketException)
+        {
+            Scribe.Debug($"Socket shutdown prematurely.");
+        }
+        catch (Exception ex)
+        {
+            Scribe.Error(ex);
+        }
+    
+        // Wait for all client tasks to complete during shutdown
+        await Task.WhenAll(_clientTasks.Where(t => !t.IsCompleted));
+    }
+
+    private async Task HandleClientAsync(TcpClient client)
+    {
+        try
+        {
+            Scribe.Debug($"Client connected from {client.Client.RemoteEndPoint}");
+
+            var netClient = new FluffyClient(client);
+
+            await netClient.Messenger.SendMessageAsync("Welcome to FluffyMUD");
+            
+        }
+        catch (OperationCanceledException)
+        {
+            Scribe.Debug("Client handling was canceled.");
         }
         catch (IOException)
         {
-            Scribe.Debug($"IOException in ListenForClients. " +
-                         $"Likely due to listener being stopped.");
+            Scribe.Debug($"IO was interrupted.");
         }
         catch (Exception ex)
         {

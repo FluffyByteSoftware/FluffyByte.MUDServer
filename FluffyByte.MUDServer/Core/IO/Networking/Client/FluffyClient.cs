@@ -5,7 +5,7 @@ using FluffyByte.MUDServer.Core.Helpers;
 
 namespace FluffyByte.MUDServer.Core.IO.Networking.Client;
 
-public sealed class FluffyNetClient : IFluffyClient
+public sealed class FluffyClient : IFluffyClient
 {
     public string Name { get; private set; }
     public TcpClient TcpClient { get; private set; }
@@ -17,9 +17,10 @@ public sealed class FluffyNetClient : IFluffyClient
 
     public CancellationTokenSource CancelMe { get; private set; } = new();
 
-    public FluffyAction OnConnected { get; } = new("OnConnected");
-    public FluffyAction OnDisconnected { get; } = new("OnDisconnected");
-    public FluffyAction OnDisconnectRequested { get; } = new("OnDisconnectRequested");
+    private readonly FluffyAction _onConnected = new FluffyAction();
+    private readonly FluffyAction _onDisconnected = new FluffyAction();
+    private readonly FluffyAction _onDisconnectRequested = new FluffyAction();
+    private readonly FluffyAction _onClientPinged = new FluffyAction();
 
     public NetworkDetails Details { get; private set; }
     public Messenger Messenger { get; private set; }
@@ -46,6 +47,8 @@ public sealed class FluffyNetClient : IFluffyClient
                     _ = Task.Run(async () => await RequestDisconnectAsync());
                 }
 
+                _onClientPinged.Invoke();
+                
                 return isConnected;
             }
             catch (IOException) { }
@@ -59,7 +62,7 @@ public sealed class FluffyNetClient : IFluffyClient
         }
     }
 
-    public FluffyNetClient(TcpClient tcpClient)
+    public FluffyClient(TcpClient tcpClient)
     {
         TcpClient = tcpClient;
 
@@ -73,10 +76,13 @@ public sealed class FluffyNetClient : IFluffyClient
         
         _components.Add(Details);
         _components.Add(Messenger);
+        _onConnected.Invoke();
     }
 
     public async Task RequestDisconnectAsync()
     {
+        _onDisconnectRequested.Invoke();
+        
         if (_disconnecting) return;
 
         _disconnecting = true;
@@ -99,6 +105,8 @@ public sealed class FluffyNetClient : IFluffyClient
             
             TcpClient.Close();
 
+            _onDisconnected.Invoke(TcpClient);
+            
             await RequestDisconnectAsync();
         }
     }
