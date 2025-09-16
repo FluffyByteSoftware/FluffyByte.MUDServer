@@ -16,9 +16,9 @@ public sealed class FluffyNetClient : IFluffyClient
 
     public CancellationTokenSource CancelMe { get; private set; } = new();
 
-    public FluffyAction OnConnected { get; set; }
-    public FluffyAction OnDisconnected { get; set; }
-    public FluffyAction OnDisconnectRequested { get; set; }
+    public FluffyAction OnConnected { get; } = new("OnConnected");
+    public FluffyAction OnDisconnected { get; } = new("OnDisconnected");
+    public FluffyAction OnDisconnectRequested { get; } = new("OnDisconnectRequested");
 
     public bool IsConnected
     {
@@ -37,7 +37,7 @@ public sealed class FluffyNetClient : IFluffyClient
         }
     }
 
-    public FluffyClientMessenger Messenger { get; private set; }
+    public MessengerTool MessengerTool { get; init; }
 
     public FluffyNetClient(TcpClient tcpClient)
     {
@@ -45,25 +45,22 @@ public sealed class FluffyNetClient : IFluffyClient
 
         Name = tcpClient.Client.RemoteEndPoint?.ToString() ?? "Unknown";
         
-        Messenger = new FluffyClientMessenger(this);
+        MessengerTool = new MessengerTool(this);
 
-        _components.Add(Messenger);
+        _components.Add(MessengerTool);
         
         _disconnecting = false;
         _disposing = false;
-
-        OnConnected = FluffyEventHub.CreateEvent("Client Connected");
-
     }
 
     public async Task SendMessage(string message, bool newline = true)
     {
-        await Messenger.SendMessageAsync(message, newline);
+        await MessengerTool.SendMessageAsync(message, newline);
     }
 
     public async Task<string> ReceiveMessage()
     {
-        var response = await Messenger.ReadMessageAsync();
+        var response = await MessengerTool.ReadMessageAsync();
 
         return response;
     }
