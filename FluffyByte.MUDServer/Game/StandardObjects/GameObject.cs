@@ -1,6 +1,6 @@
 namespace FluffyByte.MUDServer.Game.StandardObjects;
 
-public sealed class GameObject(string name) : IGameObject
+public class GameObject(string name) : IGameObject
 {
     public Guid ObjectGuid { get; private set; } = Guid.NewGuid(); 
     
@@ -40,14 +40,28 @@ public sealed class GameObject(string name) : IGameObject
         return _components.Values.ToList();
     }
 
-    public void OnAttached()
+    public void OnAttached(IGameObjectComponent component)
     {
-        
+        component.Owner = this;
     }
 
-    public void OnDetached()
+    public void OnDetached(IGameObjectComponent component, IGameObject? newOwner = null)
     {
-        
+        component.Owner = newOwner;
+    }
+
+    public void Dispose()
+    {
+        foreach (var component in _components.Values)
+        {
+            if (component is IDisposable disp)
+            {
+                disp.Dispose();
+            }
+
+            component.Owner = null;
+        }
+        _components.Clear();
     }
 
 }

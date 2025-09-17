@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Folder Include="Game\StandardObjects\Living\" />
       <Folder Include="Game\World\" />
     </ItemGroup>
 

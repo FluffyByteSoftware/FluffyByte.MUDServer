@@ -1,6 +1,6 @@
 namespace FluffyByte.MUDServer.Game.StandardObjects;
 
-public interface IGameObject
+public interface IGameObject : IDisposable
 {
     string GameName { get; set; }
     Guid ObjectGuid { get; }
